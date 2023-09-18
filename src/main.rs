@@ -4,19 +4,20 @@ use std::env;
 use crate::kernel::Kernel;
 
 use image::io::Reader as ImageReader;
-use image::{DynamicImage, GenericImageView, ImageBuffer, Rgb};
+use image::{DynamicImage, GenericImageView, ImageBuffer};
 
 fn main() {
-    let img = load_image("./test.png");
+    let img = load_image("./source.png");
 
     let args: Vec<String> = env::args().map(|s| s.trim().to_owned()).collect();
-    println!("{:?}", args);
-
+    
     let (sigma, size) = {
         let sigma = args[1].parse::<f32>().unwrap();
         let size = args[2].parse::<u32>().unwrap();
         (sigma, size)
     };
+
+    let name = format!("blur_{}s_{}k.png", sigma, size);
 
 
     // // doing convolution in two steps in parallel:
@@ -39,8 +40,8 @@ fn main() {
 
     let now = std::time::Instant::now();
     let convolved = convolve(&img, &kernel);
-    println!("convolved quadratic = {}s", now.elapsed().as_secs_f64());
-    convolved.save("./canny_quad.png").unwrap();
+    println!("convolved quadratic  = {}s", now.elapsed().as_secs_f64());
+    convolved.save(format!("naïve_{}", name)).unwrap();
 
     // separating kernel into two:
 
@@ -51,8 +52,7 @@ fn main() {
     let kernel = kernel.transpose();
     let convolved = convolve(&convolved, &kernel);
     println!("convolved decomposed = {}s", now.elapsed().as_secs_f64());
-
-    convolved.save("./canny_decompose.png").unwrap();
+    convolved.save(format!("smart_{}", name)).unwrap();
 }
 
 fn load_image(path: &str) -> DynamicImage {
