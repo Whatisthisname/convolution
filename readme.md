@@ -17,7 +17,7 @@ Naïvely convolving the image (`n x n`) with the kernel $K$ (`k x k`) is O( `k` 
 The program times the two approaches:
 ```
 convolved naive_quadratic  = 0.9480615s
-convolved naive_decomposed = 0.0800129s
+convolved smart_decomposed = 0.0800129s
 ``````
 The decomposed approach is indeed faster.
 
